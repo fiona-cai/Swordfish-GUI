@@ -20,8 +20,18 @@ class MainWindow(QMainWindow):
         self.data = values[2]
         self.rssi = values[3]
         self.snr = values[4]
+        
+        contents = self.data.split('$')
+        self.gyro = ", ".join(contents[:3])
+        self.accelorometer = ", ".join(contents[3:6])
+        self.magnetometer = ", ".join(contents[6:8])
+        self.barometer = ", ".join(contents[8:9])
+        self.gnss = ", ".join(contents[9:13])
+        self.temperature = ", ".join(contents[13:])
 
     def __init__(self, parent=None):
+        self.getData("+RCV=50,5,x$y$z$x$y$z$magnetic$temeprature$altitude$lat$lon$alt$speed$15degC,-99,40")
+
         self.start_time = time.time()
         
         super(MainWindow, self).__init__(parent)
@@ -34,13 +44,13 @@ class MainWindow(QMainWindow):
         self.labelHeader.setStyleSheet("font-size: 32px; font-weight: bold; color: white; border-radius: 15px;")  # Make the header text larger and bold
 
         # Create a grid layout for the button panel
-        self.buttonPanel = QGridLayout()
+        #self.buttonPanel = QGridLayout()
 
         # Create 9 buttons and add them to the grid layout
-        for i in range(9):
-            button = QPushButton(text=f"Button {i+1}")
-            button.setStyleSheet("font-size: 32px; padding: 10px; margin:10px;")
-            self.buttonPanel.addWidget(button, i // 3, i % 3)
+        #for i in range(9):
+        #    button = QPushButton(text=f"Button {i+1}")
+        #    button.setStyleSheet("font-size: 32px; padding: 10px; margin:10px;")
+        #    self.buttonPanel.addWidget(button, i // 3, i % 3)
 
         # Create some widgets
         self.labelHeader = QLabel("Team Swordfish")
@@ -56,6 +66,9 @@ class MainWindow(QMainWindow):
         self.labelExtra1 = QLabel("Extra 1")
         self.labelExtra2 = QLabel("Extra 2")
         self.labelExtra3 = QLabel("Extra 3")
+        self.labelExtra4 = QLabel("Extra 4")
+        self.labelExtra5 = QLabel("Extra 5")
+        self.labelExtra6 = QLabel("Extra 6")
         self.button = QPushButton("Switch State")
         self.labelTime = QLabel("Mission Elapsed Time: ")
         
@@ -64,11 +77,13 @@ class MainWindow(QMainWindow):
         self.labelData.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
         self.labelRSSI.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
         self.labelSNR.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
-        self.labelSuccessRate.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
         self.labelTime.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
         self.labelExtra1.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
         self.labelExtra2.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
         self.labelExtra3.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
+        self.labelExtra4.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
+        self.labelExtra5.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
+        self.labelExtra6.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
 
         self.button.setStyleSheet("font-size: 32px; padding: 10px; margin:10px; margin-top: 50px;")
         
@@ -103,6 +118,8 @@ class MainWindow(QMainWindow):
 
         layout4.setContentsMargins(30,30,30,30)
         layout4.setSpacing(10)
+        layout5.setContentsMargins(30,30,30,30)
+        layout5.setSpacing(10)
 
 
         
@@ -115,7 +132,7 @@ class MainWindow(QMainWindow):
         layout1.addLayout( layout3 )
 
                 # Add the button panel to the layout
-        layout3.addLayout(self.buttonPanel)
+        #layout3.addLayout(self.buttonPanel)
         
         layout3.addLayout( layout4 )
         layout3.addLayout( layout5 )
@@ -123,19 +140,20 @@ class MainWindow(QMainWindow):
         layout4.addWidget(self.labelAddress)
         layout4.addWidget(self.labelLength)
         layout4.addWidget(self.labelTime)
-        layout4.addWidget(self.labelData)
         layout4.addWidget(self.labelRSSI)
         layout4.addWidget(self.labelSNR)
-        layout4.addWidget(self.labelSuccessRate)
         #layout4.addWidget(self.labelExtra1)
         #layout4.addWidget(self.labelExtra2)
         #layout4.addWidget(self.labelExtra3)
-        layout4.addWidget(self.button)
         
         
-        layout5.addWidget(self.labelRSSI)
         
-
+        layout5.addWidget(self.labelExtra1)
+        layout5.addWidget(self.labelExtra2)
+        layout5.addWidget(self.labelExtra3)
+        layout5.addWidget(self.labelExtra4)
+        layout5.addWidget(self.labelExtra5)
+        layout5.addWidget(self.labelExtra6)
 
         # Set a fixed width for the widgets
         self.graphWidget1.setFixedWidth(600)
@@ -164,6 +182,12 @@ class MainWindow(QMainWindow):
         self.labelRSSI.setText(f"Recieved Signal Strength Indicator: {self.rssi}")
         self.labelSNR.setText(f"Signal-to-Noise Ratio: {self.snr}")
         
+        self.labelExtra1.setText(f"Transmitter Address ID: {self.gyro}")
+        self.labelExtra2.setText(f"Data Length: {self.accelorometer} bytes")
+        self.labelExtra3.setText(f"Data Content: {self.magnetometer}dBm")
+        self.labelExtra4.setText(f"Recieved Signal Strength Indicator: {self.barometer}")
+        self.labelExtra5.setText(f"Signal-to-Noise Ratio: {self.gnss}")
+        
     def update(self):
         elapsed_time = time.time() - self.start_time
 
@@ -178,14 +202,20 @@ class MainWindow(QMainWindow):
         self.labelTime.setText("Time: " + str(elapsed_time))
         self.labelAddress.setText(f"Transmitter Address ID: {self.address}")
         self.labelLength.setText(f"Data Length: {self.length} bytes")
-        self.labelData.setText(f"Data Content: {self.data}")
         self.labelRSSI.setText(f"Recieved Signal Strength Indicator: {self.rssi} dBm")
         self.labelSNR.setText(f"Signal-to-Noise Ratio: {self.snr}")
+        
+        self.labelExtra1.setText(f"Gyro: {self.gyro}")
+        self.labelExtra2.setText(f"Accelorometer {self.accelorometer}")
+        self.labelExtra3.setText(f"Magnetometer: {self.magnetometer}")
+        self.labelExtra4.setText(f"Barometer: {self.barometer}")
+        self.labelExtra5.setText(f"GNSS: {self.gnss}")
+        self.labelExtra6.setText(f"Temperature: {self.temperature}")
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     
     main = MainWindow()
-    main.getData("+RCV=50,5,HELLO,-99,40")
     main.show()
 
     sys.exit(app.exec())
