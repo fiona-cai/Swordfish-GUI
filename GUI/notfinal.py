@@ -3,10 +3,26 @@ import random
 from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QPushButton, QGridLayout
 from PyQt6.QtCore import QTimer
 import pyqtgraph as pg
+import time
+
 
 class MainWindow(QMainWindow):
+    def getData(self, received):
+        # Remove the '+RCV=' part from the received string
+        received = received.replace('+RCV=', '')
+
+        # Split the string into a list of values
+        values = received.split(',')
+
+        # Assign the values to the corresponding attributes
+        self.address = values[0]
+        self.length = values[1]
+        self.data = values[2]
+        self.rssi = values[3]
+        self.snr = values[4]
 
     def __init__(self, parent=None):
+        self.start_time = time.time()
         
         super(MainWindow, self).__init__(parent)
         self.setWindowTitle("CanSat GUI - Team Swordfish")
@@ -31,28 +47,23 @@ class MainWindow(QMainWindow):
         self.labelHeader.setStyleSheet("font-size: 32px; font-weight: bold; color: white;")  # Make the header text larger and bold
         self.graphWidget1 = pg.PlotWidget(title="Graph 1")  # Add a title to the first graph
         self.graphWidget2 = pg.PlotWidget(title="Graph 2")  # Add a title to the second graph
-        self.labelGPS = QLabel("GPS Coordinates: ")
-        self.labelState = QLabel("State: ")
-        self.labelBattery = QLabel("Battery Voltage: ")
-        self.labelDescent = QLabel("Descent Rate: ")
-        self.labelDataRate = QLabel("Telemetry Data Rate: ")
+        self.labelAddress = QLabel("GPS Coordinates: ")
+        self.labelLength = QLabel("State: ")
+        self.labelData = QLabel("Battery Voltage: ")
+        self.labelRSSI = QLabel("Descent Rate: ")
+        self.labelSNR = QLabel("Telemetry Data Rate: ")
         self.labelSuccessRate = QLabel("Telemetry Packet Success Rate: ")
         self.labelExtra1 = QLabel("Extra 1")
         self.labelExtra2 = QLabel("Extra 2")
         self.labelExtra3 = QLabel("Extra 3")
         self.button = QPushButton("Switch State")
-        self.buttonPanel1 = QPushButton(text="meow1")
-        self.buttonPanel2 = QPushButton(text="meow2")
-        self.buttonPanel3 = QPushButton(text="meow3")
-        self.buttonPanel4 = QPushButton(text="meow4")
         self.labelTime = QLabel("Mission Elapsed Time: ")
-        self.labelTime.setText(f"Mission Elapsed Time: {random.randint(0, 100)}")
         
-        self.labelGPS.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
-        self.labelState.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
-        self.labelBattery.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
-        self.labelDescent.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
-        self.labelDataRate.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
+        self.labelAddress.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
+        self.labelLength.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
+        self.labelData.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
+        self.labelRSSI.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
+        self.labelSNR.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
         self.labelSuccessRate.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
         self.labelTime.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
         self.labelExtra1.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
@@ -74,9 +85,10 @@ class MainWindow(QMainWindow):
 
         # Set up timer
         self.timer = QTimer()
-        self.timer.setInterval(500) # in milliseconds
-        self.timer.timeout.connect(self.update_plot_data)
+        self.timer.setInterval(100) # in milliseconds
+        self.timer.timeout.connect(self.update)
         self.timer.start()
+ 
 
         layout1 = QHBoxLayout()
         layout2 = QVBoxLayout()
@@ -108,12 +120,12 @@ class MainWindow(QMainWindow):
         layout3.addLayout( layout4 )
         layout3.addLayout( layout5 )
         
-        layout4.addWidget(self.labelGPS)
-        layout4.addWidget(self.labelState)
+        layout4.addWidget(self.labelAddress)
+        layout4.addWidget(self.labelLength)
         layout4.addWidget(self.labelTime)
-        layout4.addWidget(self.labelBattery)
-        layout4.addWidget(self.labelDescent)
-        layout4.addWidget(self.labelDataRate)
+        layout4.addWidget(self.labelData)
+        layout4.addWidget(self.labelRSSI)
+        layout4.addWidget(self.labelSNR)
         layout4.addWidget(self.labelSuccessRate)
         #layout4.addWidget(self.labelExtra1)
         #layout4.addWidget(self.labelExtra2)
@@ -121,7 +133,7 @@ class MainWindow(QMainWindow):
         layout4.addWidget(self.button)
         
         
-        layout5.addWidget(self.labelDescent)
+        layout5.addWidget(self.labelRSSI)
         
 
 
@@ -146,18 +158,34 @@ class MainWindow(QMainWindow):
         self.data_line2.setData(self.x, self.y2)
 
         # update labels
-        self.labelGPS.setText(f"GPS Coordinates: {round(random.uniform(-180, 180),2)}, {round(random.uniform(-90, 90),2)}")
-        self.labelState.setText(f"State: {random.choice(['Launch Detected', 'Apogee Detected', 'Landing Detected'])}")
-        self.labelTime.setText(f"Mission Elapsed Time: {random.randint(0, 100)}")
-        self.labelBattery.setText(f"Battery Voltage: {round(random.uniform(3.5, 4.2),4)}")
-        self.labelDescent.setText(f"Descent Rate: {round(random.uniform(0, 10),4)}")
-        self.labelDataRate.setText(f"Telemetry Data Rate: {random.randint(0, 1000)} bits/s")
-        self.labelSuccessRate.setText(f"Telemetry Packet Success Rate: {round(random.uniform(0.5, 1)*100,2)}%")
+        self.labelAddress.setText(f"Transmitter Address ID: {self.address}")
+        self.labelLength.setText(f"Data Length: {self.length} bytes")
+        self.labelData.setText(f"Data Content: {self.data}dBm")
+        self.labelRSSI.setText(f"Recieved Signal Strength Indicator: {self.rssi}")
+        self.labelSNR.setText(f"Signal-to-Noise Ratio: {self.snr}")
+        
+    def update(self):
+        elapsed_time = time.time() - self.start_time
 
+        self.y1 = self.y1[1:]  # remove the first y element
+        self.y1.append(random.randint(0,100))  # add a new random value
+        self.y2 = self.y2[1:]  # remove the first y element
+        self.y2.append(random.randint(0,100))  # add a new random value
+
+        self.data_line1.setData(self.x, self.y1)
+        self.data_line2.setData(self.x, self.y2)
+
+        self.labelTime.setText("Time: " + str(elapsed_time))
+        self.labelAddress.setText(f"Transmitter Address ID: {self.address}")
+        self.labelLength.setText(f"Data Length: {self.length} bytes")
+        self.labelData.setText(f"Data Content: {self.data}")
+        self.labelRSSI.setText(f"Recieved Signal Strength Indicator: {self.rssi} dBm")
+        self.labelSNR.setText(f"Signal-to-Noise Ratio: {self.snr}")
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-
+    
     main = MainWindow()
+    main.getData("+RCV=50,5,HELLO,-99,40")
     main.show()
 
     sys.exit(app.exec())
