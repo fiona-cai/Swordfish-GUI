@@ -5,6 +5,7 @@ from PyQt6.QtCore import QTimer
 import pyqtgraph as pg
 import time
 import random
+import csv
 
 class MainWindow(QMainWindow):
     def randomData(self):
@@ -215,6 +216,21 @@ class MainWindow(QMainWindow):
         self.labelExtra4.setText(f"Barometer: {self.barometer}")
         self.labelExtra5.setText(f"GNSS: {self.gnss}")
         self.labelExtra6.setText(f"Temperature: {self.temperature}")
+        
+        # Open our existing CSV file in append mode
+        # Create a file object for this file
+        with open('data.csv', 'a') as f_object:
+        
+            # Pass this file object to csv.writer()
+            # and get a writer object
+            writer_object = csv.writer(f_object)
+        
+            # Pass the list as an argument into
+            # the writerow()
+            writer_object.writerow([str(elapsed_time),self.address,self.length,self.rssi,self.snr,self.gyro,self.accelorometer,self.magnetometer,self.barometer,self.gnss,self.temperature])
+        
+            # Close the file object
+            f_object.close()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
@@ -222,5 +238,5 @@ if __name__ == "__main__":
     main = MainWindow()
     main.randomData()
     main.show()
-
+    
     sys.exit(app.exec())
