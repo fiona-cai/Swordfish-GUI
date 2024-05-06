@@ -48,18 +48,18 @@ class MainWindow(QMainWindow):
         self.labelHeader.setStyleSheet("font-size: 32px; font-weight: bold; color: white; border-radius: 15px;")  # Make the header text larger and bold
 
         # Create a grid layout for the button panel
-        #self.buttonPanel = QGridLayout()
+        self.buttonPanel = QGridLayout()
 
         # Create 9 buttons and add them to the grid layout
-        #for i in range(9):
-        #    button = QPushButton(text=f"Button {i+1}")
-        #    button.setStyleSheet("font-size: 32px; padding: 10px; margin:10px;")
-        #    self.buttonPanel.addWidget(button, i // 3, i % 3)
+        for i in range(3):
+            button = QPushButton(text=f"Button {i+1}")
+            button.setStyleSheet("font-size: 32px; padding: 10px; margin:10px;")
+            self.buttonPanel.addWidget(button, i // 3, i % 3)
 
         # Create some widgets
         self.labelHeader = QLabel("Team Swordfish")
         self.labelHeader.setStyleSheet("font-size: 32px; font-weight: bold; color: white;")  # Make the header text larger and bold
-        self.graphWidget1 = pg.PlotWidget(title="Graph 1")  # Add a title to the first graph
+        self.graphWidget1 = pg.PlotWidget(title="Altitude")  # Add a title to the first graph
         self.graphWidget2 = pg.PlotWidget(title="Graph 2")  # Add a title to the second graph
         self.labelAddress = QLabel("GPS Coordinates: ")
         self.labelLength = QLabel("State: ")
@@ -114,6 +114,7 @@ class MainWindow(QMainWindow):
         layout3 = QVBoxLayout()
         layout4 = QVBoxLayout()
         layout5 = QVBoxLayout()
+        layout6 = QVBoxLayout()
 
         layout1.setContentsMargins(20,20,20,20)
         layout1.setSpacing(20)
@@ -136,7 +137,7 @@ class MainWindow(QMainWindow):
         layout1.addLayout( layout3 )
 
                 # Add the button panel to the layout
-        #layout3.addLayout(self.buttonPanel)
+        layout3.addLayout(self.buttonPanel)
         
         layout3.addLayout( layout4 )
         layout3.addLayout( layout5 )
@@ -171,7 +172,7 @@ class MainWindow(QMainWindow):
         
     def update_plot_data(self):
         self.y1 = self.y1[1:]  # remove the first y element
-        self.y1.append(random.randint(0,100))  # add a new random value
+        self.y1.append(self.barometer)  # add a new random value
         self.y2 = self.y2[1:]  # remove the first y element
         self.y2.append(random.randint(0,100))  # add a new random value
 
