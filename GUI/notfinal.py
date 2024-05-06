@@ -4,9 +4,13 @@ from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout,
 from PyQt6.QtCore import QTimer
 import pyqtgraph as pg
 import time
-
+import random
 
 class MainWindow(QMainWindow):
+    def randomData(self):
+        string = "+RCV="
+        string = string + str(random.randint(1,100)) + ","+ str(random.randint(1,100)) + ","+ str(random.randint(1,100)) +"$" +str(random.randint(1,100))+"$" +str(random.randint(1,100))+"$" +str(random.randint(1,100))+"$" +str(random.randint(1,100))+"$" +str(random.randint(1,100))+"$" +str(random.randint(1,100))+"$" +str(random.randint(1,100))+"$" +str(random.randint(1,100))+"$" +str(random.randint(1,100))+"$" +str(random.randint(1,100))+"$" +str(random.randint(1,100))+"$" +str(random.randint(1,100)) + "$" +str(random.randint(1,100))  + ","+ str(random.randint(1,100)) + ","+ str(random.randint(1,100))
+        return(string)
     def getData(self, received):
         # Remove the '+RCV=' part from the received string
         received = received.replace('+RCV=', '')
@@ -30,7 +34,6 @@ class MainWindow(QMainWindow):
         self.temperature = ", ".join(contents[13:])
 
     def __init__(self, parent=None):
-        self.getData("+RCV=50,5,x$y$z$x$y$z$magnetic$temeprature$altitude$lat$lon$alt$speed$15degC,-99,40")
 
         self.start_time = time.time()
         
@@ -189,6 +192,7 @@ class MainWindow(QMainWindow):
         self.labelExtra5.setText(f"Signal-to-Noise Ratio: {self.gnss}")
         
     def update(self):
+        self.getData(self.randomData())
         elapsed_time = time.time() - self.start_time
 
         self.y1 = self.y1[1:]  # remove the first y element
@@ -216,6 +220,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     
     main = MainWindow()
+    main.randomData()
     main.show()
 
     sys.exit(app.exec())
