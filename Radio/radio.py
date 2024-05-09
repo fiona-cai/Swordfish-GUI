@@ -7,7 +7,7 @@ class Radio():
         self.__PORT = port
         self.__BAUDRATE = baudrate
         self.__TIMEOUT = timeOut
-        #self.__RADIO = serial.Serial(self.__PORT, self.__BAUDRATE, timeout = self.__TIMEOUT)      
+        self.__RADIO = serial.Serial(self.__PORT, self.__BAUDRATE, timeout = self.__TIMEOUT)      
 
     def sendSelf(self, x):
         self.__RADIO.write(bytes(x+"\r\n", 'utf-8'))
@@ -16,10 +16,14 @@ class Radio():
             self.__RADIO.write(bytes("AT+SEND=%d,%d,%s\r\n" %(address, sys.getsizeof(x)-49, x), 'utf-8'))
     
     def read(self):
-        print(self.__RADIO.readline().decode())
+        data = self.__RADIO.readline().decode()
+        print(data)
+        return data
 
     def readAll(self):
-        print(self.__RADIO.read_all().decode())
+        data = self.__RADIO.read_all().decode()
+        print(data)
+        return data
     
     def close(self):
          self.__RADIO.close()
@@ -72,28 +76,31 @@ class Radio():
     # Batch initialize
     def radioSetup(self, SF, BW, CR, PP, FQ, ADR, NTW, PASS, OP):
          self.setParam(SF, BW, CR, PP)
-         time.sleep(0.1)
+         time.sleep(0.15)
          self.read()
 
          self.setFRQ(FQ)
-         time.sleep(0.1)
+         time.sleep(0.15)
          self.read()
 
          self.setADR(ADR)
-         time.sleep(0.1)
+         time.sleep(0.15)
          self.read()
 
          self.setNTW(NTW)
-         time.sleep(0.1)
+         time.sleep(0.15)
          self.read()
 
          self.setPASS(PASS)
-         time.sleep(0.1)
+         time.sleep(0.15)
          self.read()
 
          self.setOP(OP)
-         time.sleep(0.1)
+         time.sleep(0.15)
          self.read()
+     
+    def available(self):
+         return self.__RADIO.in_waiting
 
      #decoding the message
     def parseMsg (self, data):
