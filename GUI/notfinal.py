@@ -1,8 +1,11 @@
 import sys
 import random
-from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QPushButton, QGridLayout
+from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QPushButton, QGridLayout, QTabWidget
 from PyQt6.QtCore import QTimer
 import pyqtgraph as pg
+import pyqtgraph.opengl as gl
+import numpy as np
+
 import time
 import random
 import csv
@@ -39,6 +42,30 @@ class MainWindow(QMainWindow):
         self.start_time = time.time()
         
         super(MainWindow, self).__init__(parent)
+        self.tabs = QTabWidget()
+
+        # Create widgets for the tabs
+        self.tab1 = QWidget()
+        self.tab2 = QWidget()
+
+        # Add tabs
+        self.tabs.addTab(self.tab1, "Tab 1")
+        self.tabs.addTab(self.tab2, "Tab 2")
+
+        # Create layout for the first tab
+        self.tab1.layout1 = QVBoxLayout(self)
+        self.tab1.setLayout(self.tab1.layout1)
+        self.tab1.layout2 = QVBoxLayout(self)
+        self.tab1.setLayout(self.tab1.layout2)
+        self.tab1.layout3 = QVBoxLayout(self)
+        self.tab1.setLayout(self.tab1.layout3)
+        self.tab1.layout4 = QVBoxLayout(self)
+        self.tab1.setLayout(self.tab1.layout4)
+        self.tab1.layout5 = QVBoxLayout(self)
+        self.tab1.setLayout(self.tab1.layout5)
+
+
+        
         self.setWindowTitle("CanSat GUI - Team Swordfish")
         self.setStyleSheet("background-color: #dddddd;")
         self.showFullScreen()  # Make the application full screen
@@ -104,94 +131,75 @@ class MainWindow(QMainWindow):
 
         # Set up timer
         self.timer = QTimer()
-        self.timer.setInterval(100) # in milliseconds
+        self.timer.setInterval(50) # in milliseconds
         self.timer.timeout.connect(self.update)
         self.timer.start()
  
 
-        layout1 = QHBoxLayout()
-        layout2 = QVBoxLayout()
-        layout3 = QVBoxLayout()
-        layout4 = QVBoxLayout()
-        layout5 = QVBoxLayout()
-        layout6 = QVBoxLayout()
+        self.tab1.layout1.setContentsMargins(20,20,20,20)
+        self.tab1.layout1.setSpacing(20)
+        self.tab1.layout2.setContentsMargins(20,20,20,20)
+        self.tab1.layout2.setSpacing(20)
 
-        layout1.setContentsMargins(20,20,20,20)
-        layout1.setSpacing(20)
-        layout2.setContentsMargins(20,20,20,20)
-        layout2.setSpacing(20)
-
-        layout4.setContentsMargins(30,30,30,30)
-        layout4.setSpacing(10)
-        layout5.setContentsMargins(30,30,30,30)
-        layout5.setSpacing(10)
+        self.tab1.layout4.setContentsMargins(30,30,30,30)
+        self.tab1.layout4.setSpacing(10)
+        self.tab1.layout5.setContentsMargins(30,30,30,30)
+        self.tab1.layout5.setSpacing(10)
 
 
         
         
 
-        layout2.addWidget(self.graphWidget1)
-        layout2.addWidget(self.graphWidget2)
+        self.tab1.layout2.addWidget(self.graphWidget1)
+        self.tab1.layout2.addWidget(self.graphWidget2)
 
-        layout1.addLayout( layout2 )
-        layout1.addLayout( layout3 )
+        self.tab1.layout1.addLayout( self.tab1.layout2 )
+        self.tab1.layout1.addLayout( self.tab1.layout3 )
 
                 # Add the button panel to the layout
-        layout3.addLayout(self.buttonPanel)
+        self.tab1.layout3.addLayout(self.buttonPanel)
         
-        layout3.addLayout( layout4 )
-        layout3.addLayout( layout5 )
+        self.tab1.layout3.addLayout( self.tab1.layout4 )
+        self.tab1.layout3.addLayout( self.tab1.layout5 )
         
-        layout4.addWidget(self.labelAddress)
-        layout4.addWidget(self.labelLength)
-        layout4.addWidget(self.labelTime)
-        layout4.addWidget(self.labelRSSI)
-        layout4.addWidget(self.labelSNR)
-        #layout4.addWidget(self.labelExtra1)
-        #layout4.addWidget(self.labelExtra2)
-        #layout4.addWidget(self.labelExtra3)
+        self.tab1.layout4.addWidget(self.labelAddress)
+        self.tab1.layout4.addWidget(self.labelLength)
+        self.tab1.layout4.addWidget(self.labelTime)
+        self.tab1.layout4.addWidget(self.labelRSSI)
+        self.tab1.layout4.addWidget(self.labelSNR)
+        #self.tab1.layout4.addWidget(self.labelExtra1)
+        #self.tab1.layout4.addWidget(self.labelExtra2)
+        #self.tab1.layout4.addWidget(self.labelExtra3)
         
         
         
-        layout5.addWidget(self.labelExtra1)
-        layout5.addWidget(self.labelExtra2)
-        layout5.addWidget(self.labelExtra3)
-        layout5.addWidget(self.labelExtra4)
-        layout5.addWidget(self.labelExtra5)
-        layout5.addWidget(self.labelExtra6)
+        self.tab1.layout5.addWidget(self.labelExtra1)
+        self.tab1.layout5.addWidget(self.labelExtra2)
+        self.tab1.layout5.addWidget(self.labelExtra3)
+        self.tab1.layout5.addWidget(self.labelExtra4)
+        self.tab1.layout5.addWidget(self.labelExtra5)
+        self.tab1.layout5.addWidget(self.labelExtra6)
 
         # Set a fixed width for the widgets
         self.graphWidget1.setFixedWidth(600)
         self.graphWidget2.setFixedWidth(600)
 
-
-        widget = QWidget()
-        widget.setLayout(layout1)
-        self.setCentralWidget(widget)
         
-        
-    def update_plot_data(self):
-        self.y1 = self.y1[1:]  # remove the first y element
-        self.y1.append(self.barometer)  # add a new random value
-        self.y2 = self.y2[1:]  # remove the first y element
-        self.y2.append(random.randint(0,100))  # add a new random value
+        # Create a 3D plot for the second tab
+        self.graphWidget3 = gl.GLViewWidget()
+        self.plot3D = gl.GLLinePlotItem(pos=np.array([self.x, self.y1, self.z]).T, color=pg.glColor((0,255,0)), width=2, antialias=True)
+        self.graphWidget3.addItem(self.plot3D)
 
-        # update line with new data
-        self.data_line1.setData(self.x, self.y1)
-        self.data_line2.setData(self.x, self.y2)
+        # Create layout for the second tab
+        self.tab2.layout = QVBoxLayout(self)
+        self.tab2.setLayout(self.tab2.layout)
 
-        # update labels
-        self.labelAddress.setText(f"Transmitter Address ID: {self.address}")
-        self.labelLength.setText(f"Data Length: {self.length} bytes")
-        self.labelData.setText(f"Data Content: {self.data}dBm")
-        self.labelRSSI.setText(f"Recieved Signal Strength Indicator: {self.rssi}")
-        self.labelSNR.setText(f"Signal-to-Noise Ratio: {self.snr}")
+        # Add the 3D plot to the second tab
+        self.tab2.layout.addWidget(self.graphWidget3)
+
+        # Set QTabWidget as the central widget
+        self.setCentralWidget(self.tabs)
         
-        self.labelExtra1.setText(f"Transmitter Address ID: {self.gyro}")
-        self.labelExtra2.setText(f"Data Length: {self.accelorometer} bytes")
-        self.labelExtra3.setText(f"Data Content: {self.magnetometer}dBm")
-        self.labelExtra4.setText(f"Recieved Signal Strength Indicator: {self.barometer}")
-        self.labelExtra5.setText(f"Signal-to-Noise Ratio: {self.gnss}")
         
     def update(self):
         self.getData(self.randomData())
