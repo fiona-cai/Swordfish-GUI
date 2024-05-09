@@ -252,8 +252,8 @@ class MainWindow(QMainWindow):
 
         self.labelTime.setText(f"MET: {(round(elapsed_time))}")
         self.nlabelAddress.setText(f"{self.address}")
-        self.nlabelLength.setText(f"{self.length} bytes")
-        self.nlabelRSSI.setText(f"{self.rssi} dBm")
+        self.nlabelLength.setText(f"{self.length}")
+        self.nlabelRSSI.setText(f"{self.rssi}")
         self.nlabelSNR.setText(f"{self.snr}")
         
         self.nlabelExtra1.setText(f"{self.gyro}")
