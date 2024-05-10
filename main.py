@@ -133,10 +133,13 @@ class MainWindow(QMainWindow):
         self.buttonPanel.addWidget(self.labelTime, 0,0)
 
         # Create 9 buttons and add them to the grid layout
-        for i in range(2):
-            button = QPushButton(text=f"Button {i+1}")
-            button.setStyleSheet("font-size: 32px; padding: 10px; margin:10px;")
-            self.buttonPanel.addWidget(button, 0, i+1)
+        button = QPushButton(text=f"Switch")
+        button.setStyleSheet("font-size: 32px; padding: 10px; margin:10px;")
+        self.buttonPanel.addWidget(button, 0, 1)
+        
+        button = QPushButton(text=f"Reset")
+        button.setStyleSheet("font-size: 32px; padding: 10px; margin:10px;")
+        self.buttonPanel.addWidget(button, 0, 2)
             
             
         # Set up plot
@@ -179,8 +182,7 @@ class MainWindow(QMainWindow):
         layout5.setSpacing(10)
         
         layout2.addWidget(self.graphWidget1)
-        layout2.addWidget(self.graphWidget4)
-        layout2.addWidget(self.graphWidget2)
+
 
         layout1.addLayout( layout2 )
         layout1.addLayout( layout3 )
