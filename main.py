@@ -9,6 +9,7 @@ import numpy as np
 import time
 import random
 import csv
+import math
 
 
 class MainWindow(QMainWindow):
@@ -48,18 +49,7 @@ class MainWindow(QMainWindow):
 
         # Create some widgets
         self.labelHeader = QLabel("Team Swordfish")
-        
-        super(MainWindow, self).__init__(parent)
-        self.tabs = QTabWidget()
 
-        # Create widgets for the tabs
-        self.tab1 = QWidget()
-        self.tab2 = QWidget()
-        
-         # Add tabs
-        self.tabs.addTab(self.tab1, "Tab 1")
-        self.tabs.addTab(self.tab2, "Tab 2")
-        
         layout1 = QHBoxLayout()
         layout2 = QVBoxLayout()
         layout3 = QVBoxLayout()
@@ -68,32 +58,23 @@ class MainWindow(QMainWindow):
         layout6 = QVBoxLayout()
         layout7 = QVBoxLayout()
 
-        # Create layout for the first tab
-        self.tab1.layout1 = QVBoxLayout(self)
-        self.tab1.setLayout(layout1)
-        self.tab1.layout2 = QVBoxLayout(self)
-        self.tab1.setLayout(layout2)
-        self.tab1.layout3 = QVBoxLayout(self)
-        self.tab1.setLayout(layout3)
-        self.tab1.layout4 = QVBoxLayout(self)
-        self.tab1.setLayout(layout4)
-        self.tab1.layout5 = QHBoxLayout(self)
-        self.tab1.setLayout(layout5)
-        self.tab1.layout6 = QVBoxLayout(self)
-        self.tab1.setLayout(layout6)
-        self.tab1.layout7 = QVBoxLayout(self)
-        self.tab1.setLayout(layout7)
         
          # Create some widgets
         self.labelHeader = QLabel("Team Swordfish")
         self.labelHeader.setStyleSheet("font-size: 32px; font-weight: bold; color: white;")  # Make the header text larger and bold
         self.graphWidget1 = pg.PlotWidget(title="Altitude")  # Add a title to the first graph
-        self.graphWidget2 = pg.PlotWidget(title="Graph 2")  # Add a title to the second graph
-        self.labelAddress = QLabel("Transmitter Address ID: ")
-        self.labelLength = QLabel("Data Length: ")
-        self.labelData = QLabel("Battery Voltage: ")
+        self.graphWidget2 = pg.PlotWidget(title="Temperature")  # Add a title to the second graph
+        self.graphWidget3 = pg.PlotWidget(title="Signal-to-Noise Ratio")
+        self.graphWidget4 = pg.PlotWidget(title="Acceleration")
+        self.graphWidget5 = pg.PlotWidget(title="Recieved Signal Strength")
+        
+        self.labelRadio = QLabel("Radio Config")
+        self.labelData = QLabel("Radio Data")
+        
+        self.labelAddress = QLabel("ID: ")
+        self.labelLength = QLabel("Length: ")
         self.labelRSSI = QLabel("RSSI:  ")
-        self.labelSNR = QLabel("Signal-to-Noise Ratio: ")
+        self.labelSNR = QLabel("SNR: ")
         self.labelSuccessRate = QLabel("Telemetry Packet Success Rate: ")
         self.nlabelAddress = QLabel("GPS Coordinates: ")
         self.nlabelLength = QLabel("State: ")
@@ -117,31 +98,33 @@ class MainWindow(QMainWindow):
         self.labelTime = QLabel("Mission Elapsed Time: ")
         self.nlabelTime = QLabel("Mission Elapsed Time: ")
         
-        self.labelAddress.setStyleSheet("font-size: 24px; font-weight: ; border-radius: 15px;")
-        self.labelLength.setStyleSheet("font-size: 24px; font-weight: ; border-radius: 15px;")
-        self.labelData.setStyleSheet("font-size: 24px; font-weight: ; border-radius: 15px;")
-        self.labelRSSI.setStyleSheet("font-size: 24px; font-weight: ; border-radius: 15px;")
-        self.labelSNR.setStyleSheet("font-size: 24px; font-weight: ; border-radius: 15px;")
-        self.labelTime.setStyleSheet("font-size: 48px; font-weight: ; border-radius: 15px;")
-        self.labelExtra1.setStyleSheet("font-size: 24px; font-weight: ; border-radius: 15px;")
-        self.labelExtra2.setStyleSheet("font-size: 24px; font-weight: ; border-radius: 15px;")
-        self.labelExtra3.setStyleSheet("font-size: 24px; font-weight: ; border-radius: 15px;")
-        self.labelExtra4.setStyleSheet("font-size: 24px; font-weight: ; border-radius: 15px;")
-        self.labelExtra5.setStyleSheet("font-size: 24px; font-weight: ; border-radius: 15px;")
-        self.labelExtra6.setStyleSheet("font-size: 24px; font-weight: ; border-radius: 15px;")
+        self.labelRadio.setStyleSheet("font-size: 24px; font-weight:bold ; border-radius: 15px;")
+        self.labelData.setStyleSheet("font-size: 24px; font-weight:bold ; border-radius: 15px;")
+
+        self.labelAddress.setStyleSheet("font-size: 24px; text-decoration: underline ; border-radius: 15px;")
+        self.labelLength.setStyleSheet("font-size: 24px; text-decoration: underline ; border-radius: 15px;")
+        self.labelRSSI.setStyleSheet("font-size: 24px; text-decoration: underline ; border-radius: 15px;")
+        self.labelSNR.setStyleSheet("font-size: 24px; text-decoration: underline ; border-radius: 15px;")
+        self.labelTime.setStyleSheet("font-size: 48px;  ; border-radius: 15px;")
+        self.labelExtra1.setStyleSheet("font-size: 24px; text-decoration: underline ; border-radius: 15px;")
+        self.labelExtra2.setStyleSheet("font-size: 24px; text-decoration: underline ; border-radius: 15px;")
+        self.labelExtra3.setStyleSheet("font-size: 24px; text-decoration: underline ; border-radius: 15px;")
+        self.labelExtra4.setStyleSheet("font-size: 24px; text-decoration: underline ; border-radius: 15px;")
+        self.labelExtra5.setStyleSheet("font-size: 24px; text-decoration: underline ; border-radius: 15px;")
+        self.labelExtra6.setStyleSheet("font-size: 24px; text-decoration: underline ; border-radius: 15px;")
         
-        self.nlabelAddress.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
-        self.nlabelLength.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
-        self.nlabelData.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
-        self.nlabelRSSI.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
-        self.nlabelSNR.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
-        self.nlabelTime.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
-        self.nlabelExtra1.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
-        self.nlabelExtra2.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
-        self.nlabelExtra3.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
-        self.nlabelExtra4.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
-        self.nlabelExtra5.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
-        self.nlabelExtra6.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
+        self.nlabelAddress.setStyleSheet("font-size: 24px; font-weight: ; border-radius: 15px;")
+        self.nlabelLength.setStyleSheet("font-size: 24px; font-weight: ; border-radius: 15px;")
+        self.nlabelData.setStyleSheet("font-size: 24px; font-weight: ; border-radius: 15px;")
+        self.nlabelRSSI.setStyleSheet("font-size: 24px; font-weight: ; border-radius: 15px;")
+        self.nlabelSNR.setStyleSheet("font-size: 24px; font-weight: ; border-radius: 15px;")
+        self.nlabelTime.setStyleSheet("font-size: 24px; font-weight: ; border-radius: 15px;")
+        self.nlabelExtra1.setStyleSheet("font-size: 24px; font-weight: ; border-radius: 15px;")
+        self.nlabelExtra2.setStyleSheet("font-size: 24px; font-weight: ; border-radius: 15px;")
+        self.nlabelExtra3.setStyleSheet("font-size: 24px; font-weight: ; border-radius: 15px;")
+        self.nlabelExtra4.setStyleSheet("font-size: 24px; font-weight: ; border-radius: 15px;")
+        self.nlabelExtra5.setStyleSheet("font-size: 24px; font-weight: ; border-radius: 15px;")
+        self.nlabelExtra6.setStyleSheet("font-size: 24px; font-weight: ; border-radius: 15px;")
         
         
         
@@ -158,15 +141,26 @@ class MainWindow(QMainWindow):
             
         # Set up plot
         self.x = list(range(100))  # 100 time points
-        self.y1 = [random.randint(0,100) for _ in range(100)]  # 100 data points for the first graph
-        self.y2 = [random.randint(0,100) for _ in range(100)]  # 100 data points for the second graph
-
-        self.graphWidget1.setBackground('w')
-        self.graphWidget2.setBackground('w')
-        pen = pg.mkPen(color=(255, 0, 0))
+        self.y1 = [0 for _ in range(100)]  # 100 data points for the first graph
+        self.y2 = [0 for _ in range(100)]  # 100 data points for the second graph
+        self.y3 = [0 for _ in range(100)]  # 100 data points for the second graph
+        self.y4 = [0 for _ in range(100)]
+        self.y5 = [0 for _ in range(100)]
+        
+        
+        self.graphWidget1.setBackground('#eeeeee')
+        self.graphWidget2.setBackground('#eeeeee')
+        self.graphWidget3.setBackground('#eeeeee')
+        self.graphWidget4.setBackground('#eeeeee')
+        self.graphWidget5.setBackground('#eeeeee')
+        pen = pg.mkPen(color=(255, 0, 0), width=3)
+            
         self.data_line1 =  self.graphWidget1.plot(self.x, self.y1, pen=pen)
         self.data_line2 =  self.graphWidget2.plot(self.x, self.y2, pen=pen)
-
+        self.data_line3 =  self.graphWidget3.plot(self.x, self.y3, pen=pen)
+        self.data_line4 =  self.graphWidget4.plot(self.x, self.y4, pen=pen)
+        self.data_line5 =  self.graphWidget5.plot(self.x, self.y5, pen=pen)
+        
         # Set up timer
         self.timer = QTimer()
         self.timer.setInterval(100) # in milliseconds
@@ -175,17 +169,17 @@ class MainWindow(QMainWindow):
         
         
 
-        layout1.setContentsMargins(20,20,20,20)
-        layout1.setSpacing(20)
-        layout2.setContentsMargins(20,20,20,20)
-        layout2.setSpacing(20)
+        layout1.setContentsMargins(60,60,60,60)
+        layout1.setSpacing(50)
 
-        layout4.setContentsMargins(30,30,30,30)
+
+        layout4.setContentsMargins(10,10,10,10)
         layout4.setSpacing(10)
-        layout5.setContentsMargins(30,30,30,30)
+        layout5.setContentsMargins(10,10,10,10)
         layout5.setSpacing(10)
         
         layout2.addWidget(self.graphWidget1)
+        layout2.addWidget(self.graphWidget4)
         layout2.addWidget(self.graphWidget2)
 
         layout1.addLayout( layout2 )
@@ -197,42 +191,56 @@ class MainWindow(QMainWindow):
         
         
         layout3.addLayout( layout5 )
-        layout5.addLayout( layout6 )
         layout5.addLayout( layout7 )
+        layout5.addLayout( layout6 )
+        
+        layout6.addWidget(self.labelRadio)
         
         layout6.addWidget(self.labelAddress)
+        layout6.addWidget(self.nlabelAddress)
+
         layout6.addWidget(self.labelLength)
+        layout6.addWidget(self.nlabelLength)
         
         layout6.addWidget(self.labelRSSI)
+        layout6.addWidget(self.nlabelRSSI)
+
         layout6.addWidget(self.labelSNR)
+        layout6.addWidget(self.nlabelSNR)
         
-        layout7.addWidget(self.nlabelAddress)
-        layout7.addWidget(self.nlabelLength)
-        layout7.addWidget(self.nlabelRSSI)
-        layout7.addWidget(self.nlabelSNR)
+        layout6.addWidget(self.graphWidget5)
+        layout6.addWidget(self.graphWidget3)
+
         #layout4.addWidget(self.labelExtra1)
         #layout4.addWidget(self.labelExtra2)
         #layout4.addWidget(self.labelExtra3)
         
         
-        
-        layout6.addWidget(self.labelExtra1)
-        layout6.addWidget(self.labelExtra2)
-        layout6.addWidget(self.labelExtra3)
-        layout6.addWidget(self.labelExtra4)
-        layout6.addWidget(self.labelExtra5)
-        layout6.addWidget(self.labelExtra6)
-
+        layout7.addWidget(self.labelData)
+        layout7.addWidget(self.labelExtra1)
         layout7.addWidget(self.nlabelExtra1)
+        
+        layout7.addWidget(self.labelExtra2)
         layout7.addWidget(self.nlabelExtra2)
+
+        layout7.addWidget(self.labelExtra3)
         layout7.addWidget(self.nlabelExtra3)
+
+        layout7.addWidget(self.labelExtra4)
         layout7.addWidget(self.nlabelExtra4)
+
+        layout7.addWidget(self.labelExtra5)
         layout7.addWidget(self.nlabelExtra5)
+
+        layout7.addWidget(self.labelExtra6)
         layout7.addWidget(self.nlabelExtra6)
         
         # Set a fixed width for the widgets
-        self.graphWidget1.setFixedWidth(500)
-        self.graphWidget2.setFixedWidth(500)
+        self.graphWidget1.setFixedWidth(600)
+        self.graphWidget2.setFixedWidth(600)
+        self.graphWidget4.setFixedWidth(600)
+        self.graphWidget3.setFixedWidth(300)
+        self.graphWidget5.setFixedWidth(300)
 
 
         widget = QWidget()
@@ -243,12 +251,21 @@ class MainWindow(QMainWindow):
         elapsed_time = time.time() - self.start_time
 
         self.y1 = self.y1[1:]  # remove the first y element
-        self.y1.append(random.randint(0,100))  # add a new random value
+        self.y1.append(int(self.barometer))  # add a new random value
         self.y2 = self.y2[1:]  # remove the first y element
-        self.y2.append(random.randint(0,100))  # add a new random value
-
+        self.y2.append(int(self.temperature))  # add a new random value
+        self.y3 = self.y3[1:]  # remove the first y element
+        self.y3.append(int(self.snr))  # add a new random value
+        self.y4 = self.y4[1:]  # remove the first y element
+        self.y4.append(int(math.sqrt(int(self.accelorometer[0])**2+int(self.accelorometer[0])**2+int(self.accelorometer[0])**2)))  # add a new random value
+        self.y5 = self.y5[1:]  # remove the first y element
+        self.y5.append(int(self.rssi))  # add a new random value
+        
         self.data_line1.setData(self.x, self.y1)
         self.data_line2.setData(self.x, self.y2)
+        self.data_line3.setData(self.x, self.y3)
+        self.data_line4.setData(self.x, self.y4)
+        self.data_line5.setData(self.x, self.y5)
 
         self.labelTime.setText(f"MET: {(round(elapsed_time))}")
         self.nlabelAddress.setText(f"{self.address}")

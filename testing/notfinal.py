@@ -102,7 +102,9 @@ class MainWindow(QMainWindow):
         self.labelExtra6 = QLabel("Extra 6")
         self.button = QPushButton("Switch State")
         self.labelTime = QLabel("Mission Elapsed Time: ")
+        self.radio = QLabel("Radio")
         
+        self.radio.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
         self.labelAddress.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
         self.labelLength.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
         self.labelData.setStyleSheet("font-size: 32px; font-weight: ; border-radius: 15px;")
